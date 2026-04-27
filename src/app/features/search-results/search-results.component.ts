@@ -1,5 +1,5 @@
 import { A11yModule } from '@angular/cdk/a11y';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavegacionService } from '../../core/services/navegacion.service';
 import { FlightFiltersComponent } from '../../shared/components/flight-filters/flight-filters.component';
@@ -26,6 +26,14 @@ export class SearchResultsComponent implements OnInit {
   private _navegacionService = inject(NavegacionService);
   private _flightSearchService = inject(FlightSearchService);
 
+  isLoading = this._flightSearchService.isLoading;
+  error = this._flightSearchService.error;
+  filteredFlights = this._flightSearchService.filteredFlights;
+  //con esto obtengo los filtros del servicio
+  readonly filters = computed(() => ({
+    maxPrice: this._flightSearchService.maxPrice(),
+    sortBy: this._flightSearchService.sortBy(),
+  }));
 
   //inicializacion del componente con los datos de busqueda obtenidos por losquery params
   ngOnInit(): void {
@@ -41,5 +49,14 @@ export class SearchResultsComponent implements OnInit {
 
   goBack(): void {
     this._navegacionService.goBack();
+  }
+
+  //funcion para actualizar los filtros en el servicio
+  onFiltersChange(filters: {
+    maxPrice: number | null;
+    sortBy: 'price' | 'departure' | 'duration';
+  }): void {
+    this._flightSearchService.setMaxPrice(filters.maxPrice);
+    this._flightSearchService.setSortBy(filters.sortBy);
   }
 }

@@ -9,7 +9,10 @@
     />
   } @else {
     <div class="results-body">
-      <app-flight-filters />
+      <app-flight-filters
+        [filters]="filters()"
+        (filtersChange)="onFiltersChange($event)"
+      />
 
       <app-flight-list [filteredFlights]="filteredFlights()" />
     </div>

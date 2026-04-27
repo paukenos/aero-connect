@@ -1,11 +1,10 @@
-import { Component, effect, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, effect, input, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { debounceTime } from 'rxjs/operators';
-import { FlightSearchService } from '../../../features/search-results/services/flight-search.service';
+import { debounceTime, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-flight-filters',
@@ -20,36 +19,39 @@ import { FlightSearchService } from '../../../features/search-results/services/f
   styleUrl: './flight-filters.component.scss',
 })
 export class FlightFiltersComponent {
-  private _flightSearchService = inject(FlightSearchService);
+  filters = input.required<{
+    maxPrice: number | null;
+    sortBy: 'price' | 'departure' | 'duration';
+  }>();
+
+  filtersChange = output<{
+    maxPrice: number | null;
+    sortBy: 'price' | 'departure' | 'duration';
+  }>();
 
   readonly filtersForm = new FormGroup({
     maxPrice: new FormControl<number | null>(null),
-    sortBy: new FormControl<'price' | 'departure' | 'duration'>('price', { nonNullable: true }),
+    sortBy: new FormControl<'price' | 'departure' | 'duration'>('price', {
+      nonNullable: true,
+    }),
   });
-  private _sortByChanges = toSignal(
-    this.filtersForm.controls.sortBy.valueChanges.pipe(debounceTime(300)),
-    { initialValue: this.filtersForm.controls.sortBy.getRawValue() }
-  );
-  private _maxPriceChanges = toSignal(
-    this.filtersForm.controls.maxPrice.valueChanges.pipe(debounceTime(300)),
-    { initialValue: this.filtersForm.controls.maxPrice.getRawValue() }
-  );
-
 
   constructor() {
     effect(() => {
-      this.filtersForm.patchValue({
-        maxPrice: this._flightSearchService.maxPrice(),
-        sortBy: this._flightSearchService.sortBy(),
-      }, { emitEvent: false });
+      this.filtersForm.patchValue(this.filters(), { emitEvent: false });
     });
 
-    effect(() => {
-      this._flightSearchService.setSortBy(this._sortByChanges());
-    });
-
-    effect(() => {
-      this._flightSearchService.setMaxPrice(this._maxPriceChanges());
-    });
+    this.filtersForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        map((value) => ({
+          maxPrice: value.maxPrice ?? null,
+          sortBy: value.sortBy ?? 'price',
+        })),
+        takeUntilDestroyed(),
+      )
+      .subscribe((value) => {
+        this.filtersChange.emit(value);
+      });
   }
 }
