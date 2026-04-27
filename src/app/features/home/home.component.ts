@@ -1,6 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +17,7 @@ import { MatNativeDateModule } from '@angular/material/core';
   selector: 'app-home',
   standalone: true,
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -26,10 +31,18 @@ import { MatNativeDateModule } from '@angular/material/core';
 export class HomeComponent {
   private _router = inject(Router);
 
-  origin = '';
-  destination = '';
-  date = '';
-  passengers = 1;
+  readonly searchForm = new FormGroup({
+    origin: new FormControl('', {
+      validators: Validators.required,
+    }),
+    destination: new FormControl('', {
+      validators: Validators.required,
+    }),
+    date: new FormControl('', {
+      validators: Validators.required,
+    }),
+    passengers: new FormControl(1, { nonNullable: true }),
+  });
 
   readonly airports = [
     { code: 'BCN', city: 'Barcelona' },
@@ -41,13 +54,17 @@ export class HomeComponent {
   ];
 
   search(): void {
-    if (!this.origin || !this.destination || !this.date) return;
+    if (this.searchForm.invalid) return;
+
+    const { origin, destination, date, passengers } =
+      this.searchForm.getRawValue();
+
     this._router.navigate(['/flights'], {
       queryParams: {
-        origin: this.origin,
-        destination: this.destination,
-        date: this.date,
-        passengers: this.passengers,
+        origin,
+        destination,
+        date,
+        passengers,
       },
     });
   }

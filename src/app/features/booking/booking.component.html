@@ -35,7 +35,7 @@
     <section class="passenger-form-section">
       <h1 class="passenger-form-section__title">Datos de los pasajeros</h1>
 
-      <form (ngSubmit)="submit()">
+      <form [formGroup]="bookingForm" (ngSubmit)="submit()">
 
         <!-- Email de contacto -->
         <div class="form-group">
@@ -44,16 +44,16 @@
             id="contactEmail"
             class="form-group__input"
             type="email"
-            name="contactEmail"
-            [(ngModel)]="contactEmail"
+            formControlName="contactEmail"
             placeholder="tu@email.com"
             required
           />
         </div>
 
         <!-- Pasajeros -->
-        @for (passenger of passengers; track $index) {
-          <div class="passenger-card">
+        <div formArrayName="passengers">
+        @for (passenger of passengers.controls; track $index) {
+          <div class="passenger-card" [formGroupName]="$index">
             <h3 class="passenger-card__title">Pasajero {{ $index + 1 }}</h3>
 
             <div class="passenger-card__grid">
@@ -62,8 +62,7 @@
                 <input
                   class="form-group__input"
                   type="text"
-                  [name]="'firstName_' + $index"
-                  [(ngModel)]="passenger.firstName"
+                  formControlName="firstName"
                   placeholder="Nombre"
                   required
                 />
@@ -74,8 +73,7 @@
                 <input
                   class="form-group__input"
                   type="text"
-                  [name]="'lastName_' + $index"
-                  [(ngModel)]="passenger.lastName"
+                  formControlName="lastName"
                   placeholder="Apellidos"
                   required
                 />
@@ -85,8 +83,7 @@
                 <label class="form-group__label">Tipo de documento *</label>
                 <select
                   class="form-group__select"
-                  [name]="'docType_' + $index"
-                  [(ngModel)]="passenger.documentType"
+                  formControlName="documentType"
                 >
                   <option value="dni">DNI</option>
                   <option value="passport">Pasaporte</option>
@@ -98,15 +95,15 @@
                 <input
                   class="form-group__input"
                   type="text"
-                  [name]="'docNumber_' + $index"
-                  [(ngModel)]="passenger.documentNumber"
-                  placeholder="{{ passenger.documentType === 'dni' ? '12345678A' : 'AAB123456' }}"
+                  formControlName="documentNumber"
+                  [placeholder]="getPassengerDocumentPlaceholder($index)"
                   required
                 />
               </div>
             </div>
           </div>
         }
+        </div>
 
         @if (error) {
           <p class="submit-error">{{ error }}</p>

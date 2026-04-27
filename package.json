@@ -11,6 +11,9 @@
     "test": "ng test"
   },
   "private": true,
+  "volta": {
+    "node": "19.9.0"
+  },
   "dependencies": {
     "@angular/animations": "^19.2.21",
     "@angular/cdk": "^19.2.19",

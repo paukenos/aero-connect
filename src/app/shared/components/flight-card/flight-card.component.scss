@@ -1,0 +1,234 @@
+.results-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  &__back { color: var(--color-primary); }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--color-text);
+  }
+
+  &__meta {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+  }
+}
+
+.results-loading,
+.results-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: var(--color-text-secondary);
+
+  mat-icon { font-size: 48px; width: 48px; height: 48px; color: #f44336; }
+}
+
+.results-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filters-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  height: fit-content;
+  position: sticky;
+  top: 88px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--color-text);
+  }
+
+  &__field { width: 100%; margin-bottom: 8px; }
+}
+
+.flight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__count {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: var(--color-text-secondary);
+
+    mat-icon { font-size: 48px; width: 48px; height: 48px; }
+  }
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.flight-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  &__number {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    letter-spacing: 1px;
+  }
+
+  &__route {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  &__airport {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 80px;
+
+    &--right { align-items: flex-end; }
+  }
+
+  &__time {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1;
+  }
+
+  &__code {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin-top: 2px;
+  }
+
+  &__city {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+
+  &__connector {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__duration {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  &__line {
+    width: 100%;
+    height: 2px;
+    background: var(--color-border);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__plane {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-primary);
+    background: #fff;
+    padding: 0 4px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__seats {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+
+  &__price-block {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  &__price {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  &__price-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-right: 12px;
+  }
+
+  &__cta {
+    background: var(--color-primary) !important;
+    color: var(--color-on-primary) !important;
+    font-weight: 600 !important;
+  }
+}

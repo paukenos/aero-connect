@@ -9,10 +9,10 @@
   <section class="search-box">
     <h2 class="search-box__title">¿A dónde quieres ir?</h2>
 
-    <form class="search-form" (ngSubmit)="search()">
+    <form class="search-form" [formGroup]="searchForm" (ngSubmit)="search()">
       <mat-form-field appearance="outline" class="search-form__field">
         <mat-label>Origen</mat-label>
-        <mat-select name="origin" [(ngModel)]="origin" required>
+        <mat-select formControlName="origin" required>
           @for (airport of airports; track airport.code) {
             <mat-option [value]="airport.code">{{ airport.city }} ({{ airport.code }})</mat-option>
           }
@@ -21,7 +21,7 @@
 
       <mat-form-field appearance="outline" class="search-form__field">
         <mat-label>Destino</mat-label>
-        <mat-select name="destination" [(ngModel)]="destination" required>
+        <mat-select formControlName="destination" required>
           @for (airport of airports; track airport.code) {
             <mat-option [value]="airport.code">{{ airport.city }} ({{ airport.code }})</mat-option>
           }
@@ -30,12 +30,12 @@
 
       <mat-form-field appearance="outline" class="search-form__field">
         <mat-label>Fecha de salida</mat-label>
-        <input matInput name="date" [(ngModel)]="date" type="date" required />
+        <input matInput formControlName="date" type="date" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="search-form__field search-form__field--small">
         <mat-label>Pasajeros</mat-label>
-        <mat-select name="passengers" [(ngModel)]="passengers">
+        <mat-select formControlName="passengers">
           @for (n of [1,2,3,4,5,6]; track n) {
             <mat-option [value]="n">{{ n }}</mat-option>
           }

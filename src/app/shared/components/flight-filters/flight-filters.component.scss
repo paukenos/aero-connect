@@ -1,0 +1,21 @@
+.filters-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+  position: sticky;
+  top: 88px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--color-text);
+  }
+
+  &__field {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}

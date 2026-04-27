@@ -1,0 +1,58 @@
+@for (flight of filteredFlights(); track flight.id) {
+    <div class="flight-card">
+      <div class="flight-card__header">
+        <span class="flight-card__number">{{ flight.flightNumber }}</span>
+        <app-status-badge [status]="flight.status" />
+      </div>
+
+      <div class="flight-card__route">
+        <div class="flight-card__airport">
+          <span class="flight-card__time">{{
+            flight.departureDate | date: "HH:mm"
+          }}</span>
+          <span class="flight-card__code">{{ flight.origin.code }}</span>
+          <span class="flight-card__city">{{ flight.origin.city }}</span>
+        </div>
+
+        <div class="flight-card__connector">
+          <span class="flight-card__duration">{{
+            flight.durationMinutes | flightDuration
+          }}</span>
+          <div class="flight-card__line">
+            <mat-icon class="flight-card__plane">flight</mat-icon>
+          </div>
+        </div>
+
+        <div class="flight-card__airport flight-card__airport--right">
+          <span class="flight-card__time">{{
+            flight.arrivalDate | date: "HH:mm"
+          }}</span>
+          <span class="flight-card__code">{{ flight.destination.code }}</span>
+          <span class="flight-card__city">{{ flight.destination.city }}</span>
+        </div>
+      </div>
+
+      <div class="flight-card__footer">
+        <div class="flight-card__seats">
+          <mat-icon>event_seat</mat-icon>
+          {{ flight.availableSeats }} plazas disponibles
+        </div>
+        <div class="flight-card__price-block">
+          <span class="flight-card__price">{{
+            flight.basePrice | currency: "EUR" : "symbol" : "1.0-0"
+          }}</span>
+          <span class="flight-card__price-label">/ persona</span>
+          <button
+            mat-flat-button
+            class="flight-card__cta"
+            (click)="bookFlight(flight)"
+            [disabled]="
+              flight.status === 'cancelled' || flight.availableSeats === 0
+            "
+          >
+            Reservar
+          </button>
+        </div>
+      </div>
+    </div>
+  }

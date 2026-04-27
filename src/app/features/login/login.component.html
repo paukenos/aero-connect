@@ -10,14 +10,13 @@
       Introduce tu email y el PNR de una reserva existente para continuar.
     </p>
 
-    <form class="login-form" (ngSubmit)="login()">
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="login()">
       <div class="form-group">
         <label class="form-group__label">Email</label>
         <input
           class="form-group__input"
           type="email"
-          name="email"
-          [(ngModel)]="email"
+          formControlName="email"
           placeholder="tu@email.com"
           autocomplete="email"
           required
@@ -29,8 +28,7 @@
         <input
           class="form-group__input"
           type="text"
-          name="pnr"
-          [(ngModel)]="pnr"
+          formControlName="pnr"
           placeholder="Ej. ABC123"
           autocomplete="off"
           required

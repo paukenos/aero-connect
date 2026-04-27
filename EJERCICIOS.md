@@ -6,6 +6,7 @@ Parte de esa refactorización implica crear un componente que pueda reutilizarse
 
 Revisa también cómo se transforma la información en los templates y aplica las abstracciones de Angular que correspondan.
 
+- Separar los distintos componentes y mirar los output y los inputs
 ---
 
 ## Ejercicio 2 — Estado con Signals y RxJS 

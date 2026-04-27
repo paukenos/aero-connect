@@ -1,0 +1,17 @@
+<!-- CABECERA DE BÚSQUEDA -->
+<div class="results-header">
+  <button mat-icon-button (click)="goBack()" class="results-header__back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <div class="results-header__info">
+    <h1 class="results-header__title">
+      {{ searchParams().origin }} → {{ searchParams().destination }}
+    </h1>
+    <p class="results-header__meta">
+      {{ searchParams().date | date: "longDate" : "" : "es" }} ·
+      {{ searchParams().passengers }} pasajero{{
+        searchParams().passengers > 1 ? "s" : ""
+      }}
+    </p>
+  </div>
+</div>

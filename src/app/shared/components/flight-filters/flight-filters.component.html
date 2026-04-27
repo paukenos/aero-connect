@@ -1,0 +1,18 @@
+<!-- PANEL DE FILTROS (extraer a FlightFiltersComponent) -->
+<aside class="filters-panel" [formGroup]="filtersForm">
+  <h2 class="filters-panel__title">Filtros</h2>
+
+  <mat-form-field appearance="outline" class="filters-panel__field">
+    <mat-label>Precio máximo (€)</mat-label>
+    <input matInput type="number" formControlName="maxPrice" min="0" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filters-panel__field">
+    <mat-label>Ordenar por</mat-label>
+    <mat-select formControlName="sortBy">
+      <mat-option value="price">Precio</mat-option>
+      <mat-option value="departure">Hora de salida</mat-option>
+      <mat-option value="duration">Duración</mat-option>
+    </mat-select>
+  </mat-form-field>
+</aside>

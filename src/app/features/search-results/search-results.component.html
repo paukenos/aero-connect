@@ -1,114 +1,17 @@
 <div class="results-page">
-
-  <!-- CABECERA DE BÚSQUEDA -->
-  <div class="results-header">
-    <button mat-icon-button (click)="goBack()" class="results-header__back">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div class="results-header__info">
-      <h1 class="results-header__title">
-        {{ searchParams.origin }} → {{ searchParams.destination }}
-      </h1>
-      <p class="results-header__meta">
-        {{ searchParams.date | date:'longDate':'':'es' }} ·
-        {{ searchParams.passengers }} pasajero{{ searchParams.passengers > 1 ? 's' : '' }}
-      </p>
-    </div>
-  </div>
-
-  @if (isLoading) {
-    <div class="results-loading">
-      <mat-spinner diameter="48" />
-      <p>Buscando los mejores vuelos...</p>
-    </div>
-  } @else if (error) {
-    <div class="results-error">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ error }}</p>
-      <button mat-flat-button (click)="goBack()">Volver a buscar</button>
-    </div>
+  @if (isLoading()) {
+    <app-shared-loader message="Buscando los mejores vuelos..." />
+  } @else if (error()) {
+    <app-shared-error
+      [message]="error()!"
+      actionLabel="Volver a buscar"
+      (action)="goBack()"
+    />
   } @else {
-
     <div class="results-body">
+      <app-flight-filters />
 
-      <!-- PANEL DE FILTROS (extraer a FlightFiltersComponent) -->
-      <aside class="filters-panel">
-        <h2 class="filters-panel__title">Filtros</h2>
-
-        <mat-form-field appearance="outline" class="filters-panel__field">
-          <mat-label>Precio máximo (€)</mat-label>
-          <input matInput type="number" [(ngModel)]="maxPrice" min="0" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filters-panel__field">
-          <mat-label>Ordenar por</mat-label>
-          <mat-select [(ngModel)]="sortBy">
-            <mat-option value="price">Precio</mat-option>
-            <mat-option value="departure">Hora de salida</mat-option>
-            <mat-option value="duration">Duración</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </aside>
-
-      <!-- LISTA DE VUELOS (extraer a FlightListComponent) -->
-      <section class="flight-list">
-        <p class="flight-list__count">
-          {{ filteredFlights.length }} vuelo{{ filteredFlights.length !== 1 ? 's' : '' }} encontrado{{ filteredFlights.length !== 1 ? 's' : '' }}
-        </p>
-
-        @if (filteredFlights.length === 0) {
-          <div class="flight-list__empty">
-            <p>No hay vuelos disponibles con estos filtros.</p>
-          </div>
-        }
-
-        <!-- TARJETA DE VUELO (extraer a FlightCardComponent en shared/) -->
-        @for (flight of filteredFlights; track flight.id) {
-          <div class="flight-card">
-            <div class="flight-card__header">
-              <span class="flight-card__number">{{ flight.flightNumber }}</span>
-              <app-status-badge [status]="flight.status" />
-            </div>
-
-            <div class="flight-card__route">
-              <div class="flight-card__airport">
-                <span class="flight-card__time">{{ flight.departureDate | date:'HH:mm' }}</span>
-                <span class="flight-card__code">{{ flight.origin.code }}</span>
-                <span class="flight-card__city">{{ flight.origin.city }}</span>
-              </div>
-
-              <div class="flight-card__connector">
-                <span class="flight-card__duration">{{ formatDuration(flight.durationMinutes) }}</span>
-                <div class="flight-card__line">
-                  <mat-icon class="flight-card__plane">flight</mat-icon>
-                </div>
-              </div>
-
-              <div class="flight-card__airport flight-card__airport--right">
-                <span class="flight-card__time">{{ flight.arrivalDate | date:'HH:mm' }}</span>
-                <span class="flight-card__code">{{ flight.destination.code }}</span>
-                <span class="flight-card__city">{{ flight.destination.city }}</span>
-              </div>
-            </div>
-
-            <div class="flight-card__footer">
-              <div class="flight-card__seats">
-                <mat-icon>event_seat</mat-icon>
-                {{ flight.availableSeats }} plazas disponibles
-              </div>
-              <div class="flight-card__price-block">
-                <span class="flight-card__price">{{ flight.basePrice | currency:'EUR':'symbol':'1.0-0' }}</span>
-                <span class="flight-card__price-label">/ persona</span>
-                <button mat-flat-button class="flight-card__cta" (click)="bookFlight(flight)"
-                  [disabled]="flight.status === 'cancelled' || flight.availableSeats === 0">
-                  Reservar
-                </button>
-              </div>
-            </div>
-          </div>
-        }
-      </section>
-
+      <app-flight-list [filteredFlights]="filteredFlights()" />
     </div>
   }
 </div>
