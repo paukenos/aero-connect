@@ -23,15 +23,15 @@
       }
 
 # CORS preflight para /api/auth/login
-- request:
-    url: /api/auth/login
-    method: OPTIONS
-  response:
-    status: 200
-    headers:
-      Access-Control-Allow-Origin: "*"
-      Access-Control-Allow-Methods: "POST, OPTIONS"
-      Access-Control-Allow-Headers: "Content-Type, Authorization"
+# - request:
+#     url: /api/auth/login
+#     method: OPTIONS
+#   response:
+#     status: 200
+#     headers:
+#       Access-Control-Allow-Origin: "*"
+#       Access-Control-Allow-Methods: "POST, OPTIONS"
+#       Access-Control-Allow-Headers: "Content-Type, Authorization"
 
 # ─────────────────────────────────────────────
 # AIRPORTS
@@ -53,6 +53,17 @@
         { "code": "PMI", "city": "Palma de Mallorca" },
         { "code": "LPA", "city": "Las Palmas" }
       ]
+
+# CORS preflight para /api/airports
+# - request:
+#     url: /api/airports
+#     method: OPTIONS
+#   response:
+#     status: 200
+#     headers:
+#       Access-Control-Allow-Origin: "*"
+#       Access-Control-Allow-Methods: "POST, OPTIONS"
+#       Access-Control-Allow-Headers: "Content-Type, Authorization"
 
 # ─────────────────────────────────────────────
 # FLIGHTS — Search
@@ -152,31 +163,7 @@
         }
       ]
 
-# Fallback genérico para cualquier búsqueda de vuelos
-- request:
-    url: /api/flights
-    method: GET
-  response:
-    status: 200
-    headers:
-      content-type: application/json
-      Access-Control-Allow-Origin: "*"
-    body: >
-      [
-        {
-          "id": "fl-099",
-          "flightNumber": "AC9999",
-          "origin": { "code": "BCN", "city": "Barcelona", "country": "España" },
-          "destination": { "code": "VLC", "city": "Valencia", "country": "España" },
-          "departureDate": "2025-08-01T10:00:00",
-          "arrivalDate": "2025-08-01T11:05:00",
-          "durationMinutes": 65,
-          "basePrice": 38,
-          "availableSeats": 60,
-          "airline": "AeroConnect",
-          "status": "scheduled"
-        }
-      ]
+
 
 # ─────────────────────────────────────────────
 # FLIGHTS — Detail (by id)
@@ -249,7 +236,31 @@
         "airline": "AeroConnect",
         "status": "scheduled"
       }
-
+# Fallback genérico para cualquier búsqueda de vuelos
+- request:
+    url: /api/flights
+    method: GET
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    body: >
+      [
+        {
+          "id": "fl-099",
+          "flightNumber": "AC9999",
+          "origin": { "code": "BCN", "city": "Barcelona", "country": "España" },
+          "destination": { "code": "VLC", "city": "Valencia", "country": "España" },
+          "departureDate": "2025-08-01T10:00:00",
+          "arrivalDate": "2025-08-01T11:05:00",
+          "durationMinutes": 65,
+          "basePrice": 38,
+          "availableSeats": 60,
+          "airline": "AeroConnect",
+          "status": "scheduled"
+        }
+      ]
 # ─────────────────────────────────────────────
 # BOOKINGS — Create (protegido con Bearer token)
 # ─────────────────────────────────────────────
@@ -273,7 +284,32 @@
         "origin": "BCN",
         "destination": "MAD",
         "departureDate": "2025-07-15T07:00:00",
-        "passengers": [],
+        "passengers": [
+          {
+            "id": "p-001",
+            "firstName": "Ana",
+            "lastName": "García López",
+            "email": "ana.garcia@email.com",
+            "phone": "+34 612 345 678",
+            "documentType": "dni",
+            "documentNumber": "12345678A",
+            "nationality": "Española",
+            "frequentFlyer": true,
+            "totalFlights": 47
+          },
+          {
+            "id": "p-002",
+            "firstName": "James",
+            "lastName": "Smith",
+            "email": "james.smith@email.co.uk",
+            "phone": "+44 7700 900123",
+            "documentType": "passport",
+            "documentNumber": "GB123456789",
+            "nationality": "Británica",
+            "frequentFlyer": false,
+            "totalFlights": 3
+          }
+        ],
         "totalPrice": 118,
         "status": "confirmed",
         "createdAt": "2025-04-22T10:00:00"
@@ -291,17 +327,102 @@
       { "error": "Unauthorized", "message": "Se requiere autenticación." }
 
 # CORS preflight para /api/bookings
+# - request:
+#     url: /api/bookings
+#     method: OPTIONS
+#   response:
+#     status: 200
+#     headers:
+#       Access-Control-Allow-Origin: "*"
+#       Access-Control-Allow-Methods: "POST, OPTIONS"
+#       Access-Control-Allow-Headers: "Content-Type, Authorization"
+
+# ─────────────────────────────────────────────
+# ERROR TESTING — simulación de errores HTTP
+# Usar para probar el errorInterceptor
+# ─────────────────────────────────────────────
+
+# 500 — Internal Server Error (catchError → status 500)
 - request:
-    url: /api/bookings
-    method: OPTIONS
+    url: /api/error/500
+    method: GET
+  response:
+    status: 500
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    body: >
+      {
+        "error": "INTERNAL_ERROR",
+        "message": "Internal server error. Please try again later."
+      }
+
+# 404 — Not Found (catchError → status 404)
+- request:
+    url: /api/error/404
+    method: GET
+  response:
+    status: 404
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    body: >
+      {
+        "error": "NOT_FOUND",
+        "message": "The requested resource was not found."
+      }
+
+# 403 — Forbidden (catchError → status 403)
+- request:
+    url: /api/error/403
+    method: GET
+  response:
+    status: 403
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    body: >
+      {
+        "error": "FORBIDDEN",
+        "message": "You do not have permission to perform this action."
+      }
+
+# 401 — Unauthorized (catchError → status 401)
+- request:
+    url: /api/error/401
+    method: GET
+  response:
+    status: 401
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    body: >
+      {
+        "error": "UNAUTHORIZED",
+        "message": "Unauthorized. Please log in again."
+      }
+
+# 200 con success: false — error de negocio (tap → success false)
+- request:
+    url: /api/error/business
+    method: GET
   response:
     status: 200
     headers:
+      content-type: application/json
       Access-Control-Allow-Origin: "*"
-      Access-Control-Allow-Methods: "POST, OPTIONS"
-      Access-Control-Allow-Headers: "Content-Type, Authorization"
+    body: >
+      {
+        "success": false,
+        "error": {
+          "code": "FLIGHT_UNAVAILABLE",
+          "message": "El vuelo solicitado no está disponible.",
+          "details": "No quedan plazas en la clase seleccionada."
+        }
+      }
 
-      # PASSENGERS — Lista de perfiles de pasajero
+# ─────────────────────────────────────────────
+# PASSENGERS — Lista de perfiles de pasajero
 # ─────────────────────────────────────────────
 - request:
     url: /api/passengers
@@ -698,4 +819,3 @@
 #       Access-Control-Allow-Origin: "*"
 #       Access-Control-Allow-Methods: "GET, PUT, OPTIONS"
 #       Access-Control-Allow-Headers: "Content-Type, Authorization"
-
