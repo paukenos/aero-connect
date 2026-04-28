@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { flightResolver } from './core/resolvers/flight.resolver';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { passengersResolver } from './core/resolvers/passengers.resolver';
+import { PassengerBookFacade } from './features/passenger/passenger-book.facade';
 
 export const routes: Routes = [
   {
@@ -40,6 +42,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/confirmation/confirmation.component').then(
             m => m.ConfirmationComponent
+          ),
+      },
+      {
+        path: 'passengers',
+        providers: [PassengerBookFacade],
+        resolve: { passengersResolver },
+        loadComponent: () =>
+          import('./features/passenger/passenger-book.component').then(
+            (m) => m.PassengerBookComponent,
           ),
       },
     ],

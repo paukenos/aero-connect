@@ -1,0 +1,263 @@
+<div class="book-page">
+
+  <div class="book-header">
+    <div>
+      <h1 class="book-header__title">
+        <mat-icon>contacts</mat-icon>
+        Pasajeros frecuentes
+      </h1>
+      <p class="book-header__subtitle">
+        Gestiona los perfiles de pasajero guardados en tu cuenta
+      </p>
+    </div>
+    <button mat-flat-button class="book-header__new" (click)="startNew()">
+      <mat-icon>person_add</mat-icon>
+      Nuevo pasajero
+    </button>
+  </div>
+
+  <div class="book-layout">
+
+    <!-- ── PANEL IZQUIERDO: buscador + lista ──────────────────────────────── -->
+    <aside class="passenger-panel">
+
+      <!-- Buscador (ReactiveForm) -->
+      <div class="passenger-panel__search" [formGroup]="searchForm">
+        <mat-form-field appearance="outline" class="passenger-panel__search-field">
+          <mat-label>Buscar pasajero</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput formControlName="term" placeholder="Nombre, documento, email..." />
+          @if (searchForm.controls.term.value) {
+            <button matSuffix mat-icon-button
+              (click)="searchForm.controls.term.setValue('')"
+              aria-label="Limpiar búsqueda">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Estado de carga -->
+      @if (facade.isLoading()) {
+        <div class="passenger-panel__loading">
+          <mat-spinner diameter="36" />
+          <span>Cargando pasajeros...</span>
+        </div>
+      }
+
+      <!-- Error de carga -->
+      @if (facade.error() && !facade.selectedPassenger() && !facade.isCreating()) {
+        <div class="passenger-panel__error">
+          <mat-icon>error_outline</mat-icon>
+          <p>{{ facade.error() }}</p>
+        </div>
+      }
+
+      <!-- Lista de pasajeros -->
+      @if (!facade.isLoading()) {
+        <ul class="passenger-list">
+
+          <!-- Item especial: "Nuevo pasajero" mientras se está creando -->
+          @if (facade.isCreating()) {
+            <li class="passenger-list__item passenger-list__item--active passenger-list__item--new">
+              <div class="passenger-list__avatar passenger-list__avatar--new">
+                <mat-icon>person_add</mat-icon>
+              </div>
+              <div class="passenger-list__info">
+                <span class="passenger-list__name">Nuevo pasajero</span>
+                <span class="passenger-list__doc">Sin guardar</span>
+              </div>
+            </li>
+          }
+
+          @for (passenger of facade.filteredPassengers(); track passenger.id) {
+            <li
+              class="passenger-list__item"
+              [class.passenger-list__item--active]="facade.selectedPassenger()?.id === passenger.id"
+              [class.passenger-list__item--dirty]="facade.selectedPassenger()?.id === passenger.id && hasUnsavedChanges"
+              (click)="selectPassenger(passenger)"
+              role="button"
+            >
+              <div class="passenger-list__avatar">
+                {{ passenger.firstName[0] }}{{ passenger.lastName[0] }}
+              </div>
+              <div class="passenger-list__info">
+                <span class="passenger-list__name">
+                  {{ passenger.firstName }} {{ passenger.lastName }}
+                </span>
+                <span class="passenger-list__doc">
+                  {{ passenger.documentType | uppercase }} · {{ passenger.documentNumber }}
+                </span>
+              </div>
+              <div class="passenger-list__meta">
+                @if (passenger.frequentFlyer) {
+                  <mat-icon class="passenger-list__star" title="Viajero frecuente">star</mat-icon>
+                }
+                @if (facade.selectedPassenger()?.id === passenger.id && hasUnsavedChanges()) {
+                  <span class="passenger-list__unsaved" title="Cambios sin guardar">●</span>
+                }
+              </div>
+            </li>
+          }
+
+          @if (facade.filteredPassengers().length === 0 && !facade.isLoading() && !facade.isCreating()) {
+            <li class="passenger-list__empty">
+              <mat-icon>person_search</mat-icon>
+              <p>No se encontraron pasajeros</p>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+
+    <!-- ── PANEL DERECHO: formulario de edición / alta ────────────────────── -->
+    <section class="detail-panel">
+
+      <!-- Estado vacío -->
+      @if (!facade.selectedPassenger() && !facade.isCreating()) {
+        <div class="detail-panel__empty">
+          <mat-icon>person_outline</mat-icon>
+          <p>Selecciona un pasajero de la lista para editar su perfil</p>
+          <button mat-stroked-button (click)="startNew()">
+            <mat-icon>person_add</mat-icon>
+            Añadir nuevo pasajero
+          </button>
+        </div>
+      }
+
+      <!-- Formulario (edición o alta) -->
+      @if (facade.selectedPassenger() || facade.isCreating()) {
+        <div class="detail-panel__content">
+
+          <div class="detail-panel__header">
+            <div>
+              @if (facade.isCreating()) {
+                <h2 class="detail-panel__name">Nuevo pasajero</h2>
+                <p class="detail-panel__flights">
+                  <mat-icon>info_outline</mat-icon>
+                  Rellena el formulario y guarda para añadirlo
+                </p>
+              } @else {
+                <h2 class="detail-panel__name">{{ selectedFullName() }}</h2>
+                <p class="detail-panel__flights">
+                  <mat-icon>flight</mat-icon>
+                  {{ facade.selectedPassenger()!.totalFlights }} vuelos realizados
+                </p>
+              }
+            </div>
+            @if (!facade.isCreating() && facade.selectedPassenger()?.frequentFlyer) {
+              <span class="detail-panel__badge detail-panel__badge--gold">
+                <mat-icon>star</mat-icon> Viajero frecuente
+              </span>
+            }
+          </div>
+
+          <mat-divider />
+
+          <!-- Banner de éxito -->
+          @if (facade.saveSuccess()) {
+            <div class="detail-panel__success">
+              <mat-icon>check_circle</mat-icon>
+              {{ facade.isCreating() ? 'Pasajero creado correctamente' : 'Perfil guardado correctamente' }}
+            </div>
+          }
+
+          <!-- Banner de error -->
+          @if (facade.error()) {
+            <div class="detail-panel__error-banner">
+              <mat-icon>error_outline</mat-icon>
+              {{ facade.error() }}
+            </div>
+          }
+
+          <!-- Formulario -->
+          <form [formGroup]="passengerForm" (ngSubmit)="save()" class="passenger-form">
+
+            <div class="passenger-form__row">
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="firstName" />
+                @if (passengerForm.controls.firstName.invalid && passengerForm.controls.firstName.touched) {
+                  <mat-error>El nombre es obligatorio</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Apellidos</mat-label>
+                <input matInput formControlName="lastName" />
+                @if (passengerForm.controls.lastName.invalid && passengerForm.controls.lastName.touched) {
+                  <mat-error>Los apellidos son obligatorios</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="passenger-form__row">
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email" />
+                @if (passengerForm.controls.email.invalid && passengerForm.controls.email.touched) {
+                  <mat-error>Introduce un email válido</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Teléfono</mat-label>
+                <input matInput formControlName="phone" type="tel" />
+              </mat-form-field>
+            </div>
+
+            <div class="passenger-form__row">
+              <mat-form-field appearance="outline" class="passenger-form__field passenger-form__field--small">
+                <mat-label>Tipo de documento</mat-label>
+                <mat-select formControlName="documentType">
+                  <mat-option value="dni">DNI</mat-option>
+                  <mat-option value="nie">NIE</mat-option>
+                  <mat-option value="passport">Pasaporte</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Número de documento</mat-label>
+                <input matInput formControlName="documentNumber" />
+                @if (passengerForm.controls.documentNumber.invalid && passengerForm.controls.documentNumber.touched) {
+                  <mat-error>El número de documento es obligatorio</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="passenger-form__field">
+                <mat-label>Nacionalidad</mat-label>
+                <input matInput formControlName="nationality" />
+              </mat-form-field>
+            </div>
+
+            <div class="passenger-form__row passenger-form__row--check">
+              <mat-checkbox formControlName="frequentFlyer" color="primary">
+                Viajero frecuente
+              </mat-checkbox>
+            </div>
+
+            <div class="passenger-form__actions">
+              @if (hasUnsavedChanges()) {
+                <span class="passenger-form__dirty-hint">Tienes cambios sin guardar</span>
+              }
+              <button
+                mat-flat-button
+                type="submit"
+                class="passenger-form__save"
+                [disabled]="!canSave()">
+                @if (facade.isSaving()) {
+                  <mat-spinner diameter="20" />
+                } @else {
+                  <mat-icon>{{ facade.isCreating() ? 'person_add' : 'save' }}</mat-icon>
+                }
+                {{ facade.isCreating() ? 'Crear pasajero' : 'Guardar cambios' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      }
+    </section>
+
+  </div>
+</div>
