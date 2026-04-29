@@ -1,6 +1,5 @@
 <div class="booking-page">
   <div class="booking-page__inner">
-
     <!-- RESUMEN DEL VUELO -->
     <aside class="flight-summary">
       <h2 class="flight-summary__title">Tu vuelo</h2>
@@ -9,19 +8,28 @@
           <div class="flight-summary__route">
             <span class="flight-summary__code">{{ flight.origin.code }}</span>
             <span class="flight-summary__arrow">→</span>
-            <span class="flight-summary__code">{{ flight.destination.code }}</span>
+            <span class="flight-summary__code">{{
+              flight.destination.code
+            }}</span>
           </div>
           <p class="flight-summary__cities">
             {{ flight.origin.city }} · {{ flight.destination.city }}
           </p>
           <p class="flight-summary__date">
-            {{ flight.departureDate | date:'fullDate':'':'es' }}
-            · {{ flight.departureDate | date:'HH:mm' }} – {{ flight.arrivalDate | date:'HH:mm' }}
+            {{ flight.departureDate | date: "fullDate" : "" : "es" }}
+            · {{ flight.departureDate | date: "HH:mm" }} –
+            {{ flight.arrivalDate | date: "HH:mm" }}
           </p>
           <p class="flight-summary__number">Vuelo {{ flight.flightNumber }}</p>
           <div class="flight-summary__price-row">
-            <span>{{ passengers.length }} pasajero{{ passengers.length > 1 ? 's' : '' }}</span>
-            <strong>{{ totalPrice | currency:'EUR':'symbol':'1.2-2' }}</strong>
+            <span
+              >{{ passengers.length }} pasajero{{
+                passengers.length > 1 ? "s" : ""
+              }}</span
+            >
+            <strong>{{
+              totalPrice | currency: "EUR" : "symbol" : "1.2-2"
+            }}</strong>
           </div>
         </div>
       } @else if (isLoadingFlight) {
@@ -36,10 +44,11 @@
       <h1 class="passenger-form-section__title">Datos de los pasajeros</h1>
 
       <form [formGroup]="bookingForm" (ngSubmit)="submit()">
-
         <!-- Email de contacto -->
         <div class="form-group">
-          <label class="form-group__label" for="contactEmail">Email de contacto *</label>
+          <label class="form-group__label" for="contactEmail"
+            >Email de contacto *</label
+          >
           <input
             id="contactEmail"
             class="form-group__input"
@@ -48,24 +57,46 @@
             placeholder="tu@email.com"
             required
           />
+
+          <!-- Validacion de mail en la que ponemos el ? porque el get puede devolver null -->
+          @if (
+            bookingForm.get("contactEmail")?.invalid &&
+            bookingForm.get("contactEmail")?.touched
+          ) {
+            <p class="form-group__error">
+              @if (bookingForm.get("contactEmail")?.hasError("required")) {
+                El email es obligatorio.
+              }
+              @if (bookingForm.get("contactEmail")?.hasError("email")) {
+                Introduce un email válido.
+              }
+            </p>
+          }
         </div>
 
         <!-- Pasajeros -->
         <div formArrayName="passengers">
-        @for (passenger of passengers.controls; track $index) {
-          <div class="passenger-card" [formGroupName]="$index">
-            <h3 class="passenger-card__title">Pasajero {{ $index + 1 }}</h3>
+          @for (passenger of passengers.controls; track $index) {
+            <div class="passenger-card" [formGroupName]="$index">
+              <h3 class="passenger-card__title">Pasajero {{ $index + 1 }}</h3>
 
-            <div class="passenger-card__grid">
-              <div class="form-group">
-                <label class="form-group__label">Nombre *</label>
-                <input
-                  class="form-group__input"
-                  type="text"
-                  formControlName="firstName"
-                  placeholder="Nombre"
-                  required
-                />
+              <div class="passenger-card__grid">
+                <div class="form-group">
+                  <label class="form-group__label">Nombre *</label>
+                  <input
+                    class="form-group__input"
+                    type="text"
+                    formControlName="firstName"
+                    placeholder="Nombre"
+                    required
+                  />
+                  @if (
+                    passenger.get("firstName")?.invalid &&
+                    passenger.get("firstName")?.touched
+                  ) {
+                    <p class="form-group__error">El nombre es obligatorio.</p>
+                  }
+                </div>
               </div>
 
               <div class="form-group">
@@ -77,6 +108,14 @@
                   placeholder="Apellidos"
                   required
                 />
+                @if (
+                  passenger.get("lastName")?.invalid &&
+                  passenger.get("lastName")?.touched
+                ) {
+                  <p class="form-group__error">
+                    Los apellidos son obligatorios.
+                  </p>
+                }
               </div>
 
               <div class="form-group">
@@ -99,10 +138,25 @@
                   [placeholder]="getPassengerDocumentPlaceholder($index)"
                   required
                 />
+                @if (
+                  passenger.get("documentNumber")?.touched &&
+                  (passenger.get("documentNumber")?.invalid ||
+                    passenger.hasError("invalidDocument"))
+                ) {
+                  <p class="form-group__error">
+                    @if (
+                      passenger.get("documentNumber")?.hasError("required")
+                    ) {
+                      El número de documento es obligatorio.
+                    }
+                    @if (passenger.hasError("invalidDocument")) {
+                      {{ passenger.getError("invalidDocument") }}
+                    }
+                  </p>
+                }
               </div>
             </div>
-          </div>
-        }
+          }
         </div>
 
         @if (error) {
@@ -112,17 +166,16 @@
         <button
           class="submit-btn"
           type="submit"
-          [disabled]="isSubmitting || !flight"
+          [disabled]="isSubmitting || !flight || bookingForm.invalid"
         >
           @if (isSubmitting) {
             <mat-spinner diameter="20" />
           } @else {
-            Confirmar reserva · {{ totalPrice | currency:'EUR':'symbol':'1.2-2' }}
+            Confirmar reserva ·
+            {{ totalPrice | currency: "EUR" : "symbol" : "1.2-2" }}
           }
         </button>
-
       </form>
     </section>
-
   </div>
 </div>

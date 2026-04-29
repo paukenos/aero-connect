@@ -25,7 +25,10 @@ export class FlightCardComponent {
   filteredFlights = input.required<Flight[]>();
   private _router = inject(Router);
 
+  //asi le pasamos elqueryparams a la ruta de booking para que se mantengan los pasajeros
   bookFlight(flight: Flight): void {
-    this._router.navigate(['/booking', flight.id]);
+    this._router.navigate(['/booking', flight.id], {
+      queryParamsHandling: 'preserve',
+    });
   }
 }

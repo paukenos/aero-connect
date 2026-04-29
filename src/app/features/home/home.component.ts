@@ -59,6 +59,7 @@ export class HomeComponent {
     const { origin, destination, date, passengers } =
       this.searchForm.getRawValue();
 
+    //*con los params le paso a la siguiente pagina los datos que queremos
     this._router.navigate(['/flights'], {
       queryParams: {
         origin,
